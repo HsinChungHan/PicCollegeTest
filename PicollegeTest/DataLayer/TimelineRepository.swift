@@ -5,6 +5,8 @@
 //  Created by Chung Han Hsin on 2025/9/30.
 //
 
+import Foundation
+
 public struct Timeline {
     public let length: Double // seconds or normalized 0...1 domain length base
     public let keyTimes: [Double] // normalized 0...1 positions
@@ -14,11 +16,9 @@ public struct Timeline {
     }
 }
 
-
 public protocol TimelineRepository {
     func fetchTimeline() -> Timeline
 }
-
 
 public final class InMemoryTimelineRepository: TimelineRepository {
     private let timeline: Timeline
