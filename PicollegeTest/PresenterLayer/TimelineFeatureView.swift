@@ -5,77 +5,105 @@
 //  Created by Chung Han Hsin on 2025/9/30.
 //
 import SwiftUI
-import SwiftUI
 
 public struct TimelineFeatureView: View {
-    @StateObject private var vm: TimelineViewModel
-    @StateObject private var playback = PlaybackViewModel()
+    @StateObject private var vm: TimelineFeatureViewModel
 
-    public init(repo: TimelineRepository = InMemoryTimelineRepository()) {
-        let get = DefaultGetTimelineUseCase(repo: repo)
-        let set = DefaultSetStartPercentUseCase()
+    public init(
+        repo: TimelineRepository = InMemoryTimelineRepository(),
+        durationMinutes: Double = 3.0,
+        selectionSeconds: Int = 10
+    ) {
+        let get  = DefaultGetTimelineUseCase(repo: repo)
+        let set  = DefaultSetStartPercentUseCase()
         let jump = DefaultJumpToKeyTimeUseCase(setStart: set)
-        _vm = StateObject(wrappedValue: TimelineViewModel(getTimeline: get, setStart: set, jumpUseCase: jump))
+
+        _vm = StateObject(
+            wrappedValue: TimelineFeatureViewModel(
+                getTimeline: get,
+                setStart: set,
+                jumpUseCase: jump,
+                songDurationMinutes: durationMinutes,
+                selectionSeconds: selectionSeconds
+            )
+        )
     }
 
     public var body: some View {
-        VStack(spacing: 16) {
-            // 1) KeyTimeSelectionView
-            KeyTimeSelectionView(
-                position: $vm.startPercent,
-                keyTimes: vm.timeline.keyTimes,
-                indicatorPercent: vm.startPercent
-            )
-            .frame(height: 44)
+        VStack(spacing: 14) {
 
-            // 2) ScrollingWaveformTrimmer（帶播放覆蓋層）
-            ScrollingWaveformTrimmer(
-                start: $vm.startPercent,
-                barsInSelection: playback.barsInSelection,
-                filledCountInSelection: playback.filledCountInSelection
-            ) { count in
-                // 子 view 告知「選取匡內 bar 總數」
-                if playback.barsInSelection != count {
-                    playback.barsInSelection = count
-                    if playback.filledCountInSelection > count {
-                        playback.filledCountInSelection = count
-                    }
-                }
+            // ========= Section 1: KeyTime Selection（百分比） =========
+            VStack(alignment: .leading, spacing: 6) {
+                Text("KeyTime Selection")
+                    .font(.system(.headline, design: .rounded).weight(.semibold))
+                    .foregroundStyle(.white)
+
+                // Selection: 起點% -> 終點%
+                Text("Selection: \(vm.selectionPercentText)")
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(.white)
+
+                // 第一個 Current（百分比）
+                Text("Current: \(vm.currentPercentText)")
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(Color.green)
+
+                KeyTimeSelectionView(
+                    position: $vm.startPercent,
+                    keyTimes: vm.timeline.keyTimes,
+                    indicatorPercent: vm.startPercent,
+                    title: nil // 關掉子元件內建標題，讓版面跟截圖一致
+                )
+                .frame(height: 44)
             }
-            .frame(height: 96)
 
-            // Debug info
-            Text(String(format: "start = %.3f (%.0f%%)", vm.startPercent, vm.startPercent*100))
-                .font(.system(.footnote, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.9))
+            // ========= Section 2: Music Timeline（時間） =========
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Music Timeline")
+                    .font(.system(.headline, design: .rounded).weight(.semibold))
+                    .foregroundStyle(.white)
 
-            // 3) 控制列：Play/Pause + Reset
+                // Selected: mm:ss -> mm:ss
+                Text("Selected: \(vm.selectionTimeText)")
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(.white)
+
+                // 第二個 Current（mm:ss）
+                Text("Current: \(vm.currentTimeText)")
+                    .font(.system(.subheadline, design: .monospaced))
+                    .foregroundStyle(Color.green)
+
+                // 波形：選取匡固定 10 秒、寬度 = 螢幕一半；整首歌總寬度依比例展開
+                ScrollingWaveformTrimmer(
+                    start: $vm.startPercent,
+                    songDurationSeconds: vm.songDurationSeconds,
+                    selectionSeconds: Double(vm.selectionSeconds),
+                    progressRatioInSelection: vm.progressRatioInSelection,
+                    title: nil // 關掉子元件內建標題與右側時長標籤
+                )
+                .frame(height: 96)
+            }
+
+            // 控制列（和截圖同樣：左 Pause/Play、右 Reset）
             HStack(spacing: 12) {
-                Button(playback.isPlaying ? "Pause" : "Play") {
-                    playback.isPlaying ? playback.pause() : playback.play()
-                }
-                .buttonStyle(.borderedProminent)
+                Button(vm.isPlaying ? "Pause" : "Play") { vm.togglePlay() }
+                    .buttonStyle(.borderedProminent)
 
-                Button("Reset") {
-                    playback.reset()
-                }
-                .buttonStyle(.bordered)
+                Button("Reset") { vm.reset() }
+                    .buttonStyle(.bordered)
             }
         }
         .padding()
         .background(Color.black)
         .onChange(of: vm.startPercent) { _, newValue in
-            vm.onUserDraggedTrimmer(to: newValue)
-            // 若希望拖動起點就清掉進度，可打開：
-            // playback.pause()
-            // playback.reset()
+            vm.onUserDraggedTrimmer(to: newValue) // 仍保留 0...1 clamp 的 business rule
         }
     }
 }
 
-// Local Preview
+// Preview
 #Preview {
-    TimelineFeatureView()
+    TimelineFeatureView(durationMinutes: 3.2, selectionSeconds: 10)
         .padding()
-        .background(Color.black)
+        .background(.black)
 }

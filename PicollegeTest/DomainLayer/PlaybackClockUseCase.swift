@@ -7,15 +7,14 @@
 import Foundation
 import Combine
 
-/// 把「每秒填充 1 個 bar」這件事抽成 UseCase（時鐘）。
+/// 每秒 tick 一次，用來驅動「每秒填充 1 秒」的綠色背景。
 public protocol PlaybackClockUseCase {
-    /// 從 currentIndex（-1 代表尚未開始）逐秒前進到 endIndex（不含）
-    func start(from currentIndex: Int, to endIndex: Int)
-    /// 暫停
+    /// 從 currentSec（已經累積的秒數）開始，逐秒前進直到 endSec（總秒數）。
+    /// 例如：currentSec=0, endSec=10 → 會依序送出 0...9（代表第 1~10 秒）。
+    func start(from currentSec: Int, to endSec: Int)
     func pause()
-    /// 重設（index 回到 -1）
     func reset()
-    /// 目前 index（-1 起跳），UI 可用它推算已填充的 bar 數 = index+1
+    /// 已經走到的「索引」（0 起跳），你可以把 idx+1 視為「已累積秒數」。
     var indexPublisher: AnyPublisher<Int, Never> { get }
 }
 
@@ -30,10 +29,10 @@ public final class DefaultPlaybackClockUseCase: PlaybackClockUseCase {
 
     public init() {}
 
-    public func start(from currentIndex: Int, to endIndex: Int) {
+    public func start(from currentSec: Int, to endSec: Int) {
         guard !isPlaying else { return }
-        self.current = currentIndex
-        self.end = max(currentIndex, endIndex)
+        self.current = max(-1, currentSec - 1) // 讓第一次 tick 從 currentSec 開始
+        self.end = max(0, endSec)
         isPlaying = true
 
         timer = Timer.publish(every: 1.0, on: .main, in: .common)
@@ -42,7 +41,7 @@ public final class DefaultPlaybackClockUseCase: PlaybackClockUseCase {
                 guard let self else { return }
                 let next = self.current + 1
                 if next >= self.end {
-                    self.subject.send(self.end - 1) // 最後一格
+                    self.subject.send(self.end - 1)
                     self.stop()
                 } else {
                     self.current = next
