@@ -5,6 +5,13 @@
 //  Created by Chung Han Hsin on 2025/9/29.
 //
 import SwiftUI
+/*
+ 幫我新增兩個按鈕 play 和 reset
+ 1. play 按下後，文案會變為 pause，且會從 ScrollingWaveformTrimmer 選取匡的起點開始填充綠色，以每一秒填充一個 bar 的速度，直到選取匡的終點，便不會再往右填充綠色，同時 pause 會變為 play button
+ 2.  pause button 點擊後，便會暫停填充綠色，並轉換為 play button，再按一次 play button，會接續之前的進度繼續填充，直到選取匡的終點
+ 3. reset button 按下後，一率變為 play button，並清除所有的綠色填充。若再按 play button 會再從 選取匡的起點開始填充
+ 幫我用 MVVM + Clean Architecture 的方式實作
+ */
 
 public struct ScrollingWaveformTrimmer: View {
     @Binding var start: Double                   // 0...1, selection window start

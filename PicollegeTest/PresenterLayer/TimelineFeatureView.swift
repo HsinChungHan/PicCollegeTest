@@ -38,7 +38,6 @@ public struct TimelineFeatureView: View {
         .padding()
         .background(Color.black)
         .onChange(of: vm.startPercent) { _, newValue in
-            // 兩邊同步時，如需商業規則可在這裡補強
             vm.onUserDraggedTrimmer(to: newValue)
         }
     }
