@@ -6,9 +6,11 @@
 //
 
 /*
- Responsiblity: 集中「選取框起點百分比」的基本商業規則集中：目前做 0…1 夾值（clamp）
- Rule/Side effects: No side effects, 可替換 Timeline 資料來源（記憶體、網路、磁碟），VM 不需知道細節
- Interaction: 於 TimelineFeatureViewModel 的 refreshTimeline() 使用
+ Responsiblity: 在使用者「點擊某個 key time」時，計算新的起點百分比 (startPercent)
+ Rule/Side effects:
+    1. 未來未來可擴充 snapping / easing 等跳轉策略，最後一律透過 StartBounds.clamp(_:) 收斂到合法範圍（含 0…1 與 右邊界 1 - selectionRatio）
+    2. No side effects
+ Interaction: 於 TimelineFeatureViewModel 在 call onUserTappedKeyTime 時使用 JumpToKeyTimeUseCase
  */
 
 import Foundation
@@ -21,8 +23,6 @@ protocol JumpToKeyTimeUseCase {
 }
 
 final class DefaultJumpToKeyTimeUseCase: JumpToKeyTimeUseCase {
-    init() {}
-
     func execute(currentStart: Double,
                         targetKeyPercent: Double,
                         bounds: StartBounds) -> Double {

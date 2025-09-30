@@ -7,7 +7,16 @@
 import Foundation
 import Combine
 
-/// 每秒 tick 一次，用來驅動「每秒填充 1 秒」的綠色背景。
+/*
+ Responsiblity: 提供「每秒填充綠色進度條」的計時機制，並以 Publisher（indexPublisher）對外發布進度事件，讓上層訂閱。負責開始 / 暫停 / 重設播放。
+ Rule/Side effects:
+    1. 每秒遞增一次，到選取框的終點自動停止並送出最後一個 index(對外只以 Publisher 溝通，不直接觸碰 UI)
+    2. Has side effects, 建立/取消 Timer，管理內部狀態（current、end、isPlaying）
+ Interaction:
+    1. TimelineFeatureViewModel 訂閱 indexPublisher，把 index 轉為「已播放秒數」→ 推導百分比、當前時間、綠色填充等
+    2. 由 VM 決定呼叫 play()/pause()/reset() 的時機
+*/
+
 protocol PlaybackClockUseCase {
     /// 從 currentSec（已經累積的秒數）開始，逐秒前進直到 endSec（總秒數）。
     /// 例如：currentSec=0, endSec=10 → 會依序送出 0...9（代表第 1~10 秒）。
