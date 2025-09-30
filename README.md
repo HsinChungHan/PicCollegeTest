@@ -26,7 +26,8 @@ https://github.com/user-attachments/assets/972cd7d4-bb49-4c70-932b-205e3d5c4828
 
 ## 🗂️ Project Architecture
 
-<img width="925" height="793" alt="截圖 2025-09-30 下午1 23 36" src="https://github.com/user-attachments/assets/91248d7c-c170-4b53-bbb0-e4a205530c37" />
+
+<img width="827" height="772" alt="截圖 2025-09-30 下午2 00 55" src="https://github.com/user-attachments/assets/47fcec1e-b36c-4de4-ae9a-cd69d629c74d" />
 
 
 
