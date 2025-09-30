@@ -7,17 +7,17 @@
 import Foundation
 import Combine
 
-public final class TimelineFeatureViewModel: ObservableObject {
+ final class TimelineFeatureViewModel: ObservableObject {
     // 基本狀態
-    @Published public private(set) var timeline: Timeline
-    @Published public var startPercent: Double = 0.0        // 0...1，選取匡起點
-    @Published public var isPlaying: Bool = false
-    @Published public private(set) var elapsedSecondsInSelection: Int = 0  // 已填充的秒數（0...selectionSeconds）
+    @Published  private(set) var timeline: Timeline
+    @Published  var startPercent: Double = 0.0        // 0...1，選取匡起點
+    @Published  var isPlaying: Bool = false
+    @Published  private(set) var elapsedSecondsInSelection: Int = 0  // 已填充的秒數（0...selectionSeconds）
 
     // 參數
-    public let songDurationSeconds: Double                  // 總秒數
-    public let selectionSeconds: Int                        // ✅ 固定 10 秒
-    public var selectionLengthNormalized: Double {          // 10 秒對整首歌的比例
+     let songDurationSeconds: Double                  // 總秒數
+     let selectionSeconds: Int                        // ✅ 固定 10 秒
+     var selectionLengthNormalized: Double {          // 10 秒對整首歌的比例
         min(1, Double(selectionSeconds) / songDurationSeconds)
     }
     
@@ -37,7 +37,7 @@ public final class TimelineFeatureViewModel: ObservableObject {
 
     private var bag = Set<AnyCancellable>()
 
-    public init(
+     init(
         getTimeline: GetTimelineUseCase,
         setStart: SetStartPercentUseCase,
         jumpUseCase: JumpToKeyTimeUseCase,
@@ -68,71 +68,71 @@ public final class TimelineFeatureViewModel: ObservableObject {
     }
 
     // Domain 互動
-    public func refreshTimeline() {
+     func refreshTimeline() {
         timeline = getTimeline.execute()
     }
 
-    public func onUserDraggedTrimmer(to newPercent: Double) {
+     func onUserDraggedTrimmer(to newPercent: Double) {
         startPercent = clampStart(setStart.execute(newPercent))
     }
 
-    public func onUserTappedKeyTime(_ keyPercent: Double) {
+     func onUserTappedKeyTime(_ keyPercent: Double) {
         startPercent = clampStart(
             jumpUseCase.execute(currentStart: startPercent, targetKeyPercent: keyPercent)
         )
     }
 
     // 播放控制（每秒填充 1 秒）
-    public func togglePlay() { isPlaying ? pause() : play() }
+     func togglePlay() { isPlaying ? pause() : play() }
 
-    public func play() {
+     func play() {
         isPlaying = true
         clock.start(from: elapsedSecondsInSelection, to: selectionSeconds)
     }
 
-    public func pause() {
+     func pause() {
         isPlaying = false
         clock.pause()
     }
 
-    public func reset() {
+     func reset() {
         isPlaying = false
         clock.reset()
         elapsedSecondsInSelection = 0
     }
 
     // 衍生資料（百分比 / 時間）
-    public var selectionStartPercent: Double { clamp01(startPercent) }
-    public var selectionEndPercent: Double { clamp01(startPercent + selectionLengthNormalized) }
+     var selectionStartPercent: Double { clamp01(startPercent) }
+     var selectionEndPercent: Double { clamp01(startPercent + selectionLengthNormalized) }
 
-    public var progressRatioInSelection: Double {
+     var progressRatioInSelection: Double {
         min(1, selectionSeconds == 0 ? 0 : Double(elapsedSecondsInSelection) / Double(selectionSeconds))
     }
-    public var hasGreen: Bool { elapsedSecondsInSelection > 0 }
+     var hasGreen: Bool { elapsedSecondsInSelection > 0 }
 
     /// 沒綠色 → 起點％；有綠色 → 起點＋進度（不超過終點）
-    public var currentPercent: Double {
+     var currentPercent: Double {
         let p = hasGreen
             ? (selectionStartPercent + progressRatioInSelection * selectionLengthNormalized)
             : selectionStartPercent
         return clamp01(p)
     }
 
-    public var selectionStartTimeSec: Double { selectionStartPercent * songDurationSeconds }
-    public var selectionEndTimeSec: Double   { selectionEndPercent   * songDurationSeconds }
-    public var currentTimeSec: Double        { currentPercent        * songDurationSeconds }
+     var selectionStartTimeSec: Double { selectionStartPercent * songDurationSeconds }
+     var selectionEndTimeSec: Double   { selectionEndPercent   * songDurationSeconds }
+     var currentTimeSec: Double        { currentPercent        * songDurationSeconds }
 
     // 已格式化字串
-    public var selectionPercentText: String {
+     var selectionPercentText: String {
         "\(fmtPercent(selectionStartPercent)) - \(fmtPercent(selectionEndPercent))"
     }
-    public var currentPercentText: String {
+     var currentPercentText: String {
         fmtPercent(currentPercent)
     }
-    public var selectionTimeText: String {
+     var selectionTimeText: String {
         "\(fmtTime(selectionStartTimeSec)) -> \(fmtTime(selectionEndTimeSec))"
     }
-    public var currentTimeText: String {
+     var currentTimeText: String {
         fmtTime(currentTimeSec)
     }
 

@@ -10,29 +10,29 @@ import SwiftUI
 /// 波型總長 = (歌曲總秒數 / 10) * (選取匡寬度)
 /// - `start`: 0...1，整首歌的正規化起點
 /// - `progressRatioInSelection`: 0...1，(已播秒數 / 10 秒)，控制匡內「綠色背景」填充
-public struct ScrollingWaveformTrimmer: View {
+struct ScrollingWaveformTrimmer: View {
     @Binding var start: Double
 
-    public var songDurationSeconds: Double
-    public var selectionSeconds: Double = 10
-    public var progressRatioInSelection: Double = 0
+    var songDurationSeconds: Double
+    var selectionSeconds: Double = 10
+    var progressRatioInSelection: Double = 0
 
     // 標題與總長（新增）
-    public var title: String? = "Music Timeline"
-    public var titleColor: Color = .white.opacity(0.9)
-    public var totalDurationLabelColor: Color = .white.opacity(0.7)
+    var title: String? = "Music Timeline"
+    var titleColor: Color = .white.opacity(0.9)
+    var totalDurationLabelColor: Color = .white.opacity(0.7)
 
     // 外觀
-    public var cornerRadius: CGFloat = 16
-    public var backgroundColor: Color = Color.black.opacity(0.95)
-    public var baseBarColor: Color = Color.white.opacity(0.65)
-    public var selectionBaseFill: Color = Color.white.opacity(0.08)
-    public var selectionBorderGradient: [Color] = [.orange, .purple]
-    public var progressFillColor: Color = Color.green.opacity(0.85)
+    var cornerRadius: CGFloat = 16
+    var backgroundColor: Color = Color.black.opacity(0.95)
+    var baseBarColor: Color = Color.white.opacity(0.65)
+    var selectionBaseFill: Color = Color.white.opacity(0.08)
+    var selectionBorderGradient: [Color] = [.orange, .purple]
+    var progressFillColor: Color = Color.green.opacity(0.85)
 
     @GestureState private var dragDX: CGFloat = 0
 
-    public init(start: Binding<Double>,
+    init(start: Binding<Double>,
                 songDurationSeconds: Double,
                 selectionSeconds: Double = 10,
                 progressRatioInSelection: Double = 0,
@@ -44,7 +44,7 @@ public struct ScrollingWaveformTrimmer: View {
         self.title = title
     }
 
-    public var body: some View {
+    var body: some View {
         VStack(spacing: 6) {
             // 標題列：左標題、右歌曲總時長
             HStack {

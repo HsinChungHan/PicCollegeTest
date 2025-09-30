@@ -6,10 +6,10 @@
 //
 import SwiftUI
 
-public struct TimelineFeatureView: View {
+struct TimelineFeatureView: View {
     @StateObject private var vm: TimelineFeatureViewModel
 
-    public init(
+    init(
         repo: TimelineRepository = InMemoryTimelineRepository(),
         durationMinutes: Double = 3.0,
         selectionSeconds: Int = 10
@@ -29,7 +29,7 @@ public struct TimelineFeatureView: View {
         )
     }
 
-    public var body: some View {
+    var body: some View {
         VStack(spacing: 14) {
 
             // ========= Section 1: KeyTime Selection（百分比） =========

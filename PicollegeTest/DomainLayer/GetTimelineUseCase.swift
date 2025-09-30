@@ -5,19 +5,19 @@
 //  Created by Chung Han Hsin on 2025/9/30.
 //
 
-public protocol GetTimelineUseCase {
+protocol GetTimelineUseCase {
     func execute() -> Timeline
 }
 
 
-public final class DefaultGetTimelineUseCase: GetTimelineUseCase {
+final class DefaultGetTimelineUseCase: GetTimelineUseCase {
     private let repo: TimelineRepository
     
-    public init(repo: TimelineRepository) {
+    init(repo: TimelineRepository) {
         self.repo = repo
     }
     
-    public func execute() -> Timeline {
+    func execute() -> Timeline {
         repo.fetchTimeline()
     }
 }

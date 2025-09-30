@@ -7,26 +7,26 @@
 
 import SwiftUI
 
-public struct KeyTimeSelectionView: View {
-    @Binding public var position: Double         // 0...1 目前位置
-    public var keyTimes: [Double]                // 0...1
-    public var indicatorPercent: Double?         // 黃色指示 bar
+ struct KeyTimeSelectionView: View {
+    @Binding  var position: Double         // 0...1 目前位置
+     var keyTimes: [Double]                // 0...1
+     var indicatorPercent: Double?         // 黃色指示 bar
 
     // 標題（新增）
-    public var title: String? = "KeyTime Selection"
-    public var titleColor: Color = .white.opacity(0.9)
+     var title: String? = "KeyTime Selection"
+     var titleColor: Color = .white.opacity(0.9)
 
     // 外觀
-    public var cornerRadius: CGFloat = 10
-    public var trackHeight: CGFloat = 14
-    public var dotDiameter: CGFloat = 12
+     var cornerRadius: CGFloat = 10
+     var trackHeight: CGFloat = 14
+     var dotDiameter: CGFloat = 12
 
-    public var trackColor: Color = Color.white.opacity(0.15)
-    public var trackBorder: Color = Color.black.opacity(0.35)
-    public var dotColor: Color = Color.pink
-    public var indicatorColor: Color = Color.yellow
+     var trackColor: Color = Color.white.opacity(0.15)
+     var trackBorder: Color = Color.black.opacity(0.35)
+     var dotColor: Color = Color.pink
+     var indicatorColor: Color = Color.yellow
 
-    public init(position: Binding<Double>,
+     init(position: Binding<Double>,
                 keyTimes: [Double],
                 indicatorPercent: Double? = nil,
                 title: String? = "KeyTime Selection") {
@@ -36,7 +36,7 @@ public struct KeyTimeSelectionView: View {
         self.title = title
     }
 
-    public var body: some View {
+     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             if let title {
                 Text(title)
