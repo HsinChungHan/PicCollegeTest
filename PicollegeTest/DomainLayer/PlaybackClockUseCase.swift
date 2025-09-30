@@ -27,12 +27,10 @@ final class DefaultPlaybackClockUseCase: PlaybackClockUseCase {
     private var end: Int = -1
     private var isPlaying = false
 
-    init() {}
-
     func start(from currentSec: Int, to endSec: Int) {
         guard !isPlaying else { return }
-        self.current = max(-1, currentSec - 1) // 讓第一次 tick 從 currentSec 開始
-        self.end = max(0, endSec)
+        current = max(-1, currentSec - 1) // 讓第一次 tick 從 currentSec 開始
+        end = max(0, endSec)
         isPlaying = true
 
         timer = Timer.publish(every: 1.0, on: .main, in: .common)

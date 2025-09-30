@@ -11,18 +11,22 @@
  Interaction: 於 TimelineFeatureViewModel 的 refreshTimeline() 使用
  */
 
+import Foundation
+
 protocol JumpToKeyTimeUseCase {
-    func execute(currentStart: Double, targetKeyPercent: Double) -> Double
+    /// 根據目標 key 百分比計算新的起點；實際合法範圍由 StartBounds 決定
+    func execute(currentStart: Double,
+                 targetKeyPercent: Double,
+                 bounds: StartBounds) -> Double
 }
 
 final class DefaultJumpToKeyTimeUseCase: JumpToKeyTimeUseCase {
-    private let setStart: SetStartPercentUseCase
-    init(setStart: SetStartPercentUseCase) {
-        self.setStart = setStart
-    }
-    
-    func execute(currentStart: Double, targetKeyPercent: Double) -> Double {
-        // later you can add snapping or easing rules here
-        setStart.execute(targetKeyPercent)
+    init() {}
+
+    func execute(currentStart: Double,
+                        targetKeyPercent: Double,
+                        bounds: StartBounds) -> Double {
+        // 之後可在這裡加入 snapping / easing 策略，再交給 bounds.clamp() 收斂
+        return bounds.clamp(targetKeyPercent)
     }
 }

@@ -6,6 +6,10 @@
 //
 import SwiftUI
 
+/// TimelineFeatureView（採用 Value Object：StartBounds）
+/// - 顯示四個標籤：Selection%、Current%、Selected mm:ss、Current mm:ss
+/// - KeyTimeSelectionView：點擊關鍵點可更新起點
+/// - ScrollingWaveformTrimmer：選取框固定 10 秒、寬度 = 螢幕一半；整首歌波形長度依比例展開
 struct TimelineFeatureView: View {
     @StateObject private var vm: TimelineFeatureViewModel
 
@@ -15,13 +19,10 @@ struct TimelineFeatureView: View {
         selectionSeconds: Int = 10
     ) {
         let get  = DefaultGetTimelineUseCase(repo: repo)
-        let set  = DefaultSetStartPercentUseCase()
-        let jump = DefaultJumpToKeyTimeUseCase(setStart: set)
-
+        let jump = DefaultJumpToKeyTimeUseCase() // ✅ 不再依賴 SetStart，用 Value Object 收斂
         _vm = StateObject(
             wrappedValue: TimelineFeatureViewModel(
                 getTimeline: get,
-                setStart: set,
                 jumpUseCase: jump,
                 songDurationMinutes: durationMinutes,
                 selectionSeconds: selectionSeconds
@@ -52,7 +53,7 @@ struct TimelineFeatureView: View {
                     position: $vm.startPercent,
                     keyTimes: vm.timeline.keyTimes,
                     indicatorPercent: vm.startPercent,
-                    title: nil // 關掉子元件內建標題，讓版面跟截圖一致
+                    title: nil // 關掉子元件內建標題，與版面一致
                 )
                 .frame(height: 44)
             }
@@ -79,12 +80,12 @@ struct TimelineFeatureView: View {
                     songDurationSeconds: vm.songDurationSeconds,
                     selectionSeconds: Double(vm.selectionSeconds),
                     progressRatioInSelection: vm.progressRatioInSelection,
-                    title: nil // 關掉子元件內建標題與右側時長標籤
+                    title: nil // 關掉子元件內建標題
                 )
                 .frame(height: 96)
             }
 
-            // 控制列（和截圖同樣：左 Pause/Play、右 Reset）
+            // 控制列（左 Play/Pause、右 Reset）
             HStack(spacing: 12) {
                 Button(vm.isPlaying ? "Pause" : "Play") { vm.togglePlay() }
                     .buttonStyle(.borderedProminent)
@@ -95,13 +96,14 @@ struct TimelineFeatureView: View {
         }
         .padding()
         .background(Color.black)
+        // 使用者拖曳 → 將「欲望值」交給 VM，VM 以 StartBounds 收斂到 0...maxStart
         .onChange(of: vm.startPercent) { _, newValue in
-            vm.onUserDraggedTrimmer(to: newValue) // 仍保留 0...1 clamp 的 business rule
+            vm.onUserDraggedTrimmer(to: newValue)
         }
     }
 }
 
-// Preview
+// MARK: - Preview
 #Preview {
     TimelineFeatureView(durationMinutes: 3.2, selectionSeconds: 10)
         .padding()
