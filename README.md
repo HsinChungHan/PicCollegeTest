@@ -1,6 +1,7 @@
 # 📘 README
 
 ## 🌟 Overview
+https://github.com/user-attachments/assets/972cd7d4-bb49-4c70-932b-205e3d5c4828
 - **PicCollegeTest** is a SwiftUI demo for **timeline trimming**.  
 - It showcases how to connect **Repository → UseCase → ViewModel → View** in a single feature screen, building a clean end-to-end architecture from data to presentation.
 
