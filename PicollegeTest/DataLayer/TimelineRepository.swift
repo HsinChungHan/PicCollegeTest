@@ -22,6 +22,7 @@ protocol TimelineRepository {
 
 final class InMemoryTimelineRepository: TimelineRepository {
     private let timeline: Timeline
+    // mock data
     init(timeline: Timeline = .init(keyTimes: [0.1, 0.3, 0.45, 0.65, 0.85])) {
         self.timeline = timeline
     }

@@ -9,10 +9,10 @@ import Combine
 
  final class TimelineFeatureViewModel: ObservableObject {
     // 基本狀態
-    @Published  private(set) var timeline: Timeline
-    @Published  var startPercent: Double = 0.0        // 0...1，選取匡起點
-    @Published  var isPlaying: Bool = false
-    @Published  private(set) var elapsedSecondsInSelection: Int = 0  // 已填充的秒數（0...selectionSeconds）
+    @Published private(set) var timeline: Timeline
+    @Published var startPercent: Double = 0.0        // 0...1，選取匡起點
+    @Published var isPlaying: Bool = false
+    @Published private(set) var elapsedSecondsInSelection: Int = 0  // 已填充的秒數（0...selectionSeconds）
 
     // 參數
      let songDurationSeconds: Double                  // 總秒數
